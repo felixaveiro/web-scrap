@@ -12,7 +12,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.express as px
 
-# Configuration
+
 CSV_FILE = 'agri_commodities.csv'
 DB_CONFIG = {
     'host': 'localhost',
@@ -22,7 +22,6 @@ DB_CONFIG = {
 }
 TABLE_NAME = 'agri_commodities'
 
-# 1. Scrape Data
 def scrape_commodities():
     try:
         url = 'https://tradingeconomics.com/commodities'
