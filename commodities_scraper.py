@@ -228,16 +228,77 @@ def job():
 def create_dashboard():
     app = dash.Dash(__name__)
     
+    # Define professional color scheme
+    colors = {
+        'background': '#f8f9fa',
+        'text': '#2d3748',
+        'primary': '#2b6cb0',
+        'secondary': '#718096',
+        'accent': '#48bb78'
+    }
+    
+    # Apply global styles
     app.layout = html.Div([
-        html.H1("Agricultural Commodities Dashboard"),
         html.Div([
-            html.H3("Data Last Updated: "),
-            html.Div(id='last-update-time')
-        ]),
-        dcc.Graph(id='price-chart'),
-        dcc.Graph(id='change-chart'),
-        dcc.Interval(id='interval-component', interval=30*60*1000, n_intervals=0)
-    ])
+            html.H1(
+                "Agricultural Commodities Dashboard",
+                style={
+                    'textAlign': 'center',
+                    'color': colors['text'],
+                    'fontSize': '2.5em',
+                    'fontWeight': 'bold',
+                    'marginBottom': '20px',
+                    'fontFamily': '"Roboto", sans-serif'
+                }
+            ),
+            html.Div([
+                html.H3(
+                    "Data Last Updated: ",
+                    style={
+                        'display': 'inline-block',
+                        'color': colors['secondary'],
+                        'fontSize': '1.2em',
+                        'fontWeight': 'normal',
+                        'marginRight': '10px'
+                    }
+                ),
+                html.Span(
+                    id='last-update-time',
+                    style={
+                        'color': colors['primary'],
+                        'fontSize': '1.2em',
+                        'fontWeight': 'bold'
+                    }
+                )
+            ], style={
+                'textAlign': 'center',
+                'marginBottom': '30px',
+                'backgroundColor': '#ffffff',
+                'padding': '15px',
+                'borderRadius': '8px',
+                'boxShadow': '0 2px 4px rgba(0,0,0,0.1)'
+            }),
+            html.Div([
+                dcc.Graph(id='price-chart'),
+                dcc.Graph(id='change-chart')
+            ], style={
+                'backgroundColor': '#ffffff',
+                'padding': '20px',
+                'borderRadius': '8px',
+                'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
+                'marginBottom': '20px'
+            }),
+            dcc.Interval(id='interval-component', interval=30*60*1000, n_intervals=0)
+        ], style={
+            'maxWidth': '1200px',
+            'margin': '0 auto',
+            'padding': '20px'
+        })
+    ], style={
+        'backgroundColor': colors['background'],
+        'minHeight': '100vh',
+        'fontFamily': '"Roboto", sans-serif'
+    })
     
     @app.callback(
         [Output('price-chart', 'figure'),
@@ -279,7 +340,17 @@ def create_dashboard():
             x='commodity', 
             y='price',
             title=f'{title_prefix} Commodity Prices',
-            labels={'commodity': 'Commodity', 'price': 'Price'}
+            labels={'commodity': 'Commodity', 'price': 'Price'},
+            color_discrete_sequence=[colors['primary']]
+        )
+        price_fig.update_layout(
+            title={'x': 0.5, 'xanchor': 'center', 'font': {'size': 20, 'color': colors['text']}},
+            xaxis_title="Commodity",
+            yaxis_title="Price (USD)",
+            plot_bgcolor='#ffffff',
+            paper_bgcolor='#ffffff',
+            font={'family': '"Roboto", sans-serif', 'color': colors['text']},
+            margin={'l': 50, 'r': 50, 't': 50, 'b': 50}
         )
         
         change_fig = px.bar(
@@ -289,9 +360,18 @@ def create_dashboard():
             title=f'{title_prefix} Price Changes',
             labels={'commodity': 'Commodity', 'change': 'Change'}
         )
-        change_fig.update_layout(yaxis_tickformat='.2%')
+        change_fig.update_layout(
+            title={'x': 0.5, 'xanchor': 'center', 'font': {'size': 20, 'color': colors['text']}},
+            xaxis_title="Commodity",
+            yaxis_title="Change (%)",
+            yaxis_tickformat='.2%',
+            plot_bgcolor='#ffffff',
+            paper_bgcolor='#ffffff',
+            font={'family': '"Roboto", sans-serif', 'color': colors['text']},
+            margin={'l': 50, 'r': 50, 't': 50, 'b': 50}
+        )
         change_fig.update_traces(marker_color=[
-            'green' if x > 0 else 'red' for x in df['change']
+            colors['accent'] if x > 0 else '#ef4444' for x in df['change']
         ])
         
         last_update = df['timestamp'].max() if 'timestamp' in df.columns else "Unknown"
@@ -300,7 +380,6 @@ def create_dashboard():
         return price_fig, change_fig, update_text
     
     return app
-
 # Schedule and Run
 if __name__ == "__main__":
     job()
